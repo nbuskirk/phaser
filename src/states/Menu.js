@@ -1,16 +1,17 @@
 import Phaser from 'phaser'
 import WebFont from 'webfontloader'
+import GameOptions from '../options'
 
 var cursors, selectButton, dot, gameMenu, pad1, sfx, bg;
 var selectTimer = 0;
 var backgroundSpeed = 60000; // milliseconds
-
 
 import {centerGameObjects} from '../utils'
 export default class extends Phaser.State {
   
   init () {
     
+    console.log(GameOptions);
 
     this.game.input.gamepad.start();
     pad1 = this.game.input.gamepad.pad1;
@@ -19,7 +20,8 @@ export default class extends Phaser.State {
     gameMenu = [
       { label: 'HAUNTED CASTLE', x: this.world.centerX, y: 100},
       { label: 'GAME START', x: this.world.centerX, y: 180},
-      { label: 'PASS WORD', x: this.world.centerX, y: 220}
+      { label: 'PASS WORD', x: this.world.centerX, y: 220},
+      { label: 'OPTIONS', x: this.world.centerX, y: 260}
     ]
 
     /* Menu Sound FX */
@@ -43,6 +45,7 @@ export default class extends Phaser.State {
     var _this = this;
     for(var i=0;i<gameMenu.length;i++){
       let text = _this.add.bitmapText(gameMenu[i].x, gameMenu[i].y, 'pixelFont', gameMenu[i].label, 24);
+      if(i===2 || i===3) text.tint = '0x444444';
       centerGameObjects([text])
     }    
 
@@ -69,17 +72,31 @@ export default class extends Phaser.State {
   }
   
   actionOnClick () {
+     console.log(dot.y);
      if (dot.y===gameMenu[1].y-18) this.state.start('Game'); //if we are on game start start game scene
   }
 
   update () {
-    if( (cursors.down.isDown || cursors.up.isDown || pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_DOWN)) && this.game.time.now > selectTimer) {
-      if (dot.y===gameMenu[1].y-18 ? dot.y=gameMenu[2].y-18 : dot.y=gameMenu[1].y-18);
+    if( (cursors.down.isDown || pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_DOWN)) && this.game.time.now > selectTimer) {
+      //if (dot.y===gameMenu[1].y-18 ? dot.y=gameMenu[2].y-18 : dot.y=gameMenu[1].y-18);
+      if(dot.y+40<260){
+        dot.y += 40;
+      } else {
+        dot.y = gameMenu[1].y-18;
+      }
       this.sfx.play('blip');
       this.sfx.volume = 0.10;
       selectTimer = this.game.time.now + 250;
     }
-    if(pad1.isDown(Phaser.Gamepad.XBOX360_A)) {
+    if(cursors.up.isDown && this.game.time.now > selectTimer) {
+      if(dot.y-40>160){
+        dot.y-=40;
+      } else {
+        dot.y = gameMenu[3].y-18;
+      }
+      selectTimer = this.game.time.now + 250;
+    }
+    if(pad1.isDown(Phaser.Gamepad.XBOX360_B)) {
       this.actionOnClick();
     }  
   }

@@ -7,11 +7,11 @@ export default class extends Phaser.Sprite {
     	this.game = game;
     	this.anchor.setTo(0.5);
     	this.smoothed = false;
-    	this.scale.setTo(0.5);
-    	this.game.physics.arcade.enable(this)
+    	this.scale.setTo(4);
+    	this.game.physics.arcade.enable(this);
 	}
 	update(){
-		this.scale.x *= 0.1;
+		
 	}
 
 }

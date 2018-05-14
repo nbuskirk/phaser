@@ -25,13 +25,16 @@ export default class extends Phaser.State {
     this.game.load.audio('hurt','./assets/hurt.wav')
     this.game.load.audio('enemyhit','./assets/enemyhit.wav')
     this.game.load.audio('heart','./assets/heart.wav')
+    this.game.load.audio('holywater','./assets/holywater.wav')
 
     this.game.load.spritesheet('ms', './assets/images/template.png',16,16,16) //player
     this.game.load.spritesheet('skeleton', './assets/images/template2.png',16,16,9) //skeleton
     this.game.load.spritesheet('skull', './assets/images/skull.png',16,23,12) //skull
     
-
-    this.game.load.spritesheet('torch', './assets/images/torch2.png',32,43,4)
+    this.game.load.atlasJSONHash('player', './assets/images/player/spritesheet.png', './assets/images/player/sprites.json');
+    this.game.load.atlasJSONHash('joe', './assets/images/player/joe.png', './assets/images/player/joe.json');
+    
+    this.game.load.spritesheet('torch', './assets/images/torch2.png',32,16,4)
    
     this.game.load.image('background1','./assets/images/background1.png')
     this.game.load.image('background2','./assets/images/background2.png')
@@ -42,7 +45,8 @@ export default class extends Phaser.State {
     this.game.load.image('enemylife','./assets/images/enemylife.png')
     this.game.load.image('bone','./assets/images/bone.png');
     this.game.load.image('heart','./assets/images/heart.png')
-    this.game.load.image('interfacebg','./assets/images/interfacebg.png')
+    this.game.load.image('holywater','./assets/images/holywater.png')
+    this.game.load.image('whip','./assets/images/whip.png')
    
     this.game.load.bitmapFont('pixelFont','./assets/font.png', './assets/font.fnt');
 

@@ -1,3 +1,4 @@
+import GameOptions from '../options';
 
 export default class extends Phaser.Sprite {
 
@@ -9,63 +10,68 @@ export default class extends Phaser.Sprite {
 	    this.anchor.setTo(0.5);
 	    
 	    this.smoothed = false;
-	    this.scale.setTo(2);
+	    this.scale.setTo(3);
+	    this.lives = 1;
+	    this.type = 'skull';
 
 	    this.game.physics.arcade.enable(this);
-	    
-	    /* Enemy Physics Stuff */
-	    this.body.bounce.y = 0.05;
-	    this.body.collideWorldBounds = true;
-	    this.body.outOfBoundsKill = true;
-	    //this.body.setSize(9,16,3,0) //resize it to 8x16 and middle aligned
 	   
 	    /* Add sprite animations */
     	this.animations.add('left',[9,10,11],3,true);
-    	//this.animations.add('right',[7,8,9],3,true);
-    	//this.animations.add('idle',[0,1,2],3,true);
+    	this.soundHurt = this.game.sound.add('enemyhit');
+    	
+    	if(GameOptions.soundsEnabled) {
+    		this.soundHurt.volume = GameOptions.gameVolume;
+    	} else {
+    		this.soundHurt = 0;
+    	}
 
     	this.body.gravity.y = -1500;
 
     	this.animations.play('left');
+    	
 
-    	this.points = {
-    		'x': [640,320,0],
-    		'y': [this.game.height/2,450,this.game.height/2]
-    	}
-
-    	this.increment = 1 / this.game.width;
-    	this.i = 0;
-    	this.timer1Stopped = true;
-    	this.timer1 = null;
-
-    	this.plot = this.plot.bind(this);
-
+    	this.direction = 'up';
+    	this.onHit = this.onHit.bind(this);
 	}
 	
-	plot() {
-		var posx = this.game.math.bezierInterpolation(this.points.x, this.i);
-    	var posy = this.game.math.bezierInterpolation(this.points.y, this.i); 
-    	this.x = posx;
-    	this.y = posy;
-    	this.i += this.increment;
+	
+	onHit(spr1,spr2) {
 
-    	if(posx > 640) {
-    		this.timer1.stop();
-    		this.timer1.destroy();
-    		this.i = 0;
-    		this.timer1Stopped = true;
-    	}
+		this.soundHurt.play();
+		this.body.enable = false;
+		
+		var hitEffect = this.game.add.tween(this).to({alpha:0},200,"Linear",true);
+        hitEffect.onComplete.add(function(){
+        	var dropChance = Math.round(Math.random()*3);
+			if(dropChance === 1) {
+				var treasure = this.game.treasureGroup.getFirstDead();
+				treasure.reset(this.x,this.y);
+				treasure.collideWorldBounds = true;
+			}
+			this.destroy();
+        	
+      	}, this);
+  	
+  		if(spr2.power===1){ spr2.kill(); } //bullet
+		
 	}
-
+	
 	update() {
-		
-		if(this.timer1Stopped) {
-			this.timer1Stopped = false;
-			this.timer1 = this.game.time.create(true);
-			this.timer1.loop(.01, this.plot, this);
-			this.timer1.start();
+		//this.game.debug.body(this);
+		this.body.velocity.x = -200;
+
+		switch(this.direction){
+			case 'up':
+				this.body.velocity.y -= 4;
+				if(this.body.velocity.y < -150) this.direction = 'down'
+				break;
+			case 'down':
+				this.body.velocity.y += 4;
+				if(this.body.velocity.y > 150) this.direction = 'up'
+				break;
 		}
-		
+		//this.angle = 180 - this.game.math.radToDeg(Math.atan2(this.body.velocity.x, this.body.velocity.y));
 		
 	}
 }
